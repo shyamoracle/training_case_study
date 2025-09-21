@@ -1,0 +1,25 @@
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById("dbUsername").value.trim();
+    const password = document.getElementById("dbPassword").value.trim();
+
+    try {
+      const res = await fetch("api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (res.ok) {
+        alert("✅ Credentials updated successfully!");
+        bootstrap.Modal.getInstance(document.getElementById("loginModal")).hide();
+      } else {
+        alert("❌ Login failed. Please check your credentials.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("⚠️ Error connecting to server.");
+    }
+  });
+

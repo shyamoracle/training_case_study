@@ -1,0 +1,62 @@
+package com.oracle.pmsitis;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+import org.glassfish.jersey.server.ResourceConfig;
+
+public class ApplicationResourceConfiguration extends ResourceConfig {
+	public static final Properties DB_SETTINGS = new Properties();
+	public static final Properties DB_QUERIES = new Properties();
+	
+	private static final String DB_SETTINGS_RESOURCE_NAME = "database.properties";
+	private static final String DB_QUERIES_RESOURCE_NAME = "dbquery.properties";
+	
+	public ApplicationResourceConfiguration() throws IOException {
+//		Packages will be scanned recursively, including all nested packages
+//same is mentioned in the web.xml file already
+		//		this.packages("com.oracle.pmsapp");
+		this.register(new ApplicationServicesBinderConfiguration());
+		loadFromPropertiesFile(DB_SETTINGS_RESOURCE_NAME, DB_SETTINGS);
+		loadFromPropertiesFile(DB_QUERIES_RESOURCE_NAME, DB_QUERIES);
+	}
+	
+	private void loadFromPropertiesFile(String resourceName, Properties properties) throws IOException {
+		InputStream stream = null;
+		
+		try {
+			Class<?> clsInfo = (Class<?>) this.getClass();
+			ClassLoader loader = clsInfo.getClassLoader();
+			stream = loader.getResourceAsStream(resourceName);
+			properties.load(stream);
+		} catch (IOException e) {
+			throw e;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if(stream != null)
+				stream.close();
+		}
+	}
+
+@PostConstruct
+public void testPropertiesLoaded() {
+    System.out.println("👉 DB URL: " + DB_SETTINGS.getProperty("url"));
+    System.out.println("👉 DB Username: " + DB_SETTINGS.getProperty("username"));
+}
+//	private void loadDbSettings() throws Exception {
+//		InputStream stream = null;
+//		Class<ApplicationResourceConfiguration> clsInfo = (Class<ApplicationResourceConfiguration>);
+//		
+////		getCLassLoader() method returns the instance of the ClassLoader which
+////		will be used to load the current class in the JVM runtime
+//		ClassLoader loader = clsInfo.getClassLoader();
+//		
+////		getResourceAsStream() method returns an input stream
+//		InputStream stream = loader.getResourceAsStream("database.properties");
+////		InputStream stream = this.getClass().getClassLoader();
+//	}
+	
+}
+

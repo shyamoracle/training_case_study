@@ -1,0 +1,16 @@
+document.getElementById("addForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const product = {
+    productId: +document.getElementById("productId").value,
+    productName: document.getElementById("productName").value,
+    productDescription: document.getElementById("productDescription").value,
+    productPrice: +document.getElementById("productPrice").value,
+    productReleasedOn: document.getElementById("productReleasedOn").value,
+  };
+  await addProduct(product);
+  alert("Product added!");
+  window.location.href = "index.html";
+});
+/**
+ * 
+ */

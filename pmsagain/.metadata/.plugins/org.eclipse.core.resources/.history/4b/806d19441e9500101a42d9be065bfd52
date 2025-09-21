@@ -1,0 +1,7 @@
+driver=oracle.jdbc.OracleDriver
+url=jdbc:oracle:thin:@localhost:1521:orcl
+Connection conn = DriverManager.getConnection(
+    DB_SETTINGS.getProperty("url"),
+    DB_SETTINGS.getProperty("username"),
+    DB_SETTINGS.getProperty("password")
+);

@@ -1,0 +1,53 @@
+const apiUrl = 'http://localhost:8080/pmsapp/webapi/products/add';
+
+async function addProduct(product) {
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(product)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData || 'Failed to add product');
+  }
+
+  return await response.json();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('addForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const productId = parseInt(document.getElementById('productId').value);
+    const productName = document.getElementById('productName').value.trim();
+    const productDescription = document.getElementById('productDescription').value.trim();
+    const productPrice = parseFloat(document.getElementById('productPrice').value);
+    const productReleasedOn = document.getElementById('productReleasedOn').value;
+
+    if (!productId || !productName || isNaN(productPrice) || !productReleasedOn) {
+      alert('Please fill in all required fields correctly.');
+      return;
+    }
+
+    const newProduct = {
+      id: productId,
+      name: productName,
+      description: productDescription,
+      price: productPrice,
+      releasedOn: productReleasedOn
+    };
+
+    try {
+      await addProduct(newProduct);
+      alert('Product added successfully!');
+      document.getElementById('addForm').reset();
+      window.location.href = 'index.html'; // Redirect to list page or wherever you want
+    } catch (error) {
+      alert('Error adding product: ' + error.message);
+      console.error(error);
+    }
+  });
+});

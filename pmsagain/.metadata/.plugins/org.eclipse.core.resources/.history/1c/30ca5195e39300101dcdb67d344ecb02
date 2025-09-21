@@ -1,0 +1,41 @@
+package com.oracle.pmsitis.repository.utilities;
+
+import java.sql.Connection;
+
+public class TestConnection {
+	public static void main(String[] args) {
+        try {
+            Connection conn = DaoUtility.createConnection();
+            System.out.println("✅ Database connection successful!");
+            conn.close();
+        } catch (Exception e) {
+            System.err.println("❌ Failed to connect to the database:");
+            e.printStackTrace();
+        }
+    }
+	
+	import java.io.InputStream;
+	import java.util.Properties;
+
+	public class ManualPropertyTest {
+	    public static void main(String[] args) {
+	        try {
+	            Properties props = new Properties();
+	            InputStream in = ManualPropertyTest.class.getClassLoader().getResourceAsStream("database.properties");
+	            if (in == null) {
+	                System.out.println("❌ Cannot find properties file.");
+	                return;
+	            }
+	            props.load(in);
+	            System.out.println("✅ Loaded Properties:");
+	            System.out.println("URL: " + props.getProperty("url"));
+	            System.out.println("User: " + props.getProperty("username"));
+	            System.out.println("Pass: " + props.getProperty("password"));
+	            System.out.println("Driver: " + props.getProperty("driver"));
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	}
+
+}

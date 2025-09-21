@@ -1,0 +1,57 @@
+const BASE_URL = "http://localhost:8080/pmsapp/webapi/products";
+
+// Function to add a new product
+function addProduct(product) {
+  return fetch(`${BASE_URL}/add`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(product)
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.text().then(text => {
+        throw new Error(text || 'Failed to add product');
+      });
+    }
+    return response.json();
+  });
+}
+
+// Handle form submission for adding product
+function handleFormSubmit(event) {
+  event.preventDefault();
+
+  const newProduct = {
+    productId: parseInt(document.getElementById('productId').value),
+    productName: document.getElementById('productName').value.trim(),
+    productDescription: document.getElementById('productDescription').value.trim(),
+    productPrice: parseFloat(document.getElementById('productPrice').value),
+    productReleasedOn: document.getElementById('productReleasedOn').value
+  };
+
+  // Basic validation (you can expand this)
+  if (!newProduct.productId || !newProduct.productName) {
+    alert('Please fill out the required fields');
+    return;
+  }
+
+  addProduct(newProduct)
+    .then(data => {
+      alert('Product added successfully!');
+      // Optionally clear the form or redirect
+      document.getElementById('addProductForm').reset();
+      window.location.href = 'index.html'; // redirect to list page or wherever you want
+    })
+    .catch(error => {
+      alert('Error adding product: ' + error.message);
+      console.error(error);
+    });
+}
+
+// Attach form submit handler when page loads
+window.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('addProductForm');
+  form.addEventListener('submit', handleFormSubmit);
+});

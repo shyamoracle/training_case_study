@@ -1,0 +1,115 @@
+package com.oracle.pmsitis.repository;
+
+
+//import static com.oracle.pmsitis.ApplicationResourceConfiguration.DB_QUERIES;
+import static com.oracle.pmsitis.repository.utilities.DaoUtility.createConnection;
+//import static com.oracle.pmsitis.repository.utilities.DaoUtility.closeConnection;
+import static com.oracle.pmsitis.repository.utilities.DaoUtility.convertRecordToModel;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.oracle.pmsitis.models.ProductModel;
+
+
+public class ProductRepository implements RepositoryContract<ProductModel, Integer> {
+
+    private static final String SELECT_ALL_PRODUCTS = 
+        "select product_id as ID, product_name as NAME, product_desc as DESCRIPTION, price as PRICE, product_released_on as RELEASE_DATE from products";
+
+    private static final String SELECT_PRODUCT = 
+        "select product_id as ID, product_name as NAME, product_desc as DESCRIPTION, price as PRICE, product_released_on as RELEASE_DATE from products where product_id=?";
+
+    private static final String ADD_PRODUCT = 
+        "insert into products(product_id, product_name, product_desc, price, product_released_on) values(?,?,?,?,?)";
+
+    private static final String DELETE_PRODUCT = 
+        "delete from products where product_id=?";
+
+    private static final String UPDATE_PRODUCT = 
+        "update products set product_name=?, product_desc=?, price=?, product_released_on=? where product_id=?";
+
+    @Override
+    public ProductModel insert(ProductModel data) throws Exception {
+        try (Connection connection = createConnection();
+             PreparedStatement statement = connection.prepareStatement(ADD_PRODUCT)) {
+
+            statement.setInt(1, data.getProductId());
+            statement.setString(2, data.getProductName());
+            statement.setString(3, data.getProductDescription());
+            statement.setDouble(4, data.getProductPrice());
+            statement.setDate(5, Date.valueOf(data.getProductReleasedOn()));
+
+            int result = statement.executeUpdate();
+            return result > 0 ? data : null;
+        }
+    }
+
+    @Override
+    public ProductModel remove(Integer id) throws Exception {
+        ProductModel model = get(id);
+        try (Connection connection = createConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE_PRODUCT)) {
+
+            statement.setInt(1, id);
+            int result = statement.executeUpdate();
+            return result > 0 ? model : null;
+        }
+    }
+
+    @Override
+    public ProductModel modify(Integer id, ProductModel data) throws Exception {
+        try (Connection connection = createConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE_PRODUCT)) {
+
+            statement.setString(1, data.getProductName());
+            statement.setString(2, data.getProductDescription());
+            statement.setDouble(3, data.getProductPrice());
+            statement.setDate(4, Date.valueOf(data.getProductReleasedOn()));
+            statement.setInt(5, id);
+
+            int result = statement.executeUpdate();
+            if (result > 0) {
+                data.setProductId(id);
+                return data;
+            }
+            return null;
+        }
+    }
+
+    @Override
+    public List<ProductModel> getAll() throws Exception {
+        List<ProductModel> models = new ArrayList<>();
+        try (Connection connection = createConnection();
+             Statement statement = connection.createStatement();
+             ResultSet result = statement.executeQuery(SELECT_ALL_PRODUCTS)) {
+
+            while (result.next()) {
+                ProductModel model = convertRecordToModel(result);
+                models.add(model);
+            }
+        }
+        return models;
+    }
+
+    @Override
+    public ProductModel get(Integer id) throws Exception {
+        ProductModel model = null;
+        try (Connection connection = createConnection();
+             PreparedStatement statement = connection.prepareStatement(SELECT_PRODUCT)) {
+
+            statement.setInt(1, id);
+            try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    model = convertRecordToModel(result);
+                }
+            }
+        }
+        return model;
+    }
+}

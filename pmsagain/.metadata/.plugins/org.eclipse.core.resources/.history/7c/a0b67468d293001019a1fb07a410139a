@@ -1,0 +1,5 @@
+package com.oracle.pmsitis.repository;
+
+public class RepositoryContract {
+
+}

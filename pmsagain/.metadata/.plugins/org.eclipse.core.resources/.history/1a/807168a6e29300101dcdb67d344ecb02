@@ -1,0 +1,14 @@
+package com.oracle.pmsitis.repository.utilities;
+
+public class TestConnection {
+	public static void main(String[] args) {
+        try {
+            Connection conn = DaoUtility.createConnection();
+            System.out.println("✅ Database connection successful!");
+            conn.close();
+        } catch (Exception e) {
+            System.err.println("❌ Failed to connect to the database:");
+            e.printStackTrace();
+        }
+    }
+}

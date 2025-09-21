@@ -1,0 +1,21 @@
+package com.oracle.pmsitis.test;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+public class PropertyFileTest {
+    public static void main(String[] args) {
+        Properties props = new Properties();
+        try (InputStream stream = PropertyFileTest.class.getClassLoader().getResourceAsStream("dbquery.properties")) {
+            if (stream == null) {
+                System.out.println("❌ Could not find dbquery.properties");
+            } else {
+                props.load(stream);
+                System.out.println("✅ Loaded dbquery.properties:");
+                props.forEach((k, v) -> System.out.println(k + " = " + v));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}

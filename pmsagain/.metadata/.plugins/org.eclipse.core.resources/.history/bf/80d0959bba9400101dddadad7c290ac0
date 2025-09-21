@@ -1,0 +1,54 @@
+const apiUrl = 'http://localhost:8080/pmsapp/webapi/products/add';
+
+function addProduct(product) {
+  return fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(product)
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(err => {
+        throw new Error(err || 'Failed to add product');
+      });
+    }
+    return response.json();
+  });
+}
+
+document.getElementById('addProductForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const productId = parseInt(document.getElementById('productId').value);
+  const productName = document.getElementById('productName').value.trim();
+  const productDescription = document.getElementById('productDescription').value.trim();
+  const productPrice = parseFloat(document.getElementById('productPrice').value);
+  const productReleasedOn = document.getElementById('productReleasedOn').value;
+
+  if (!productId || !productName || isNaN(productPrice) || !productReleasedOn) {
+    alert('Please fill in all required fields correctly.');
+    return;
+  }
+
+  const newProduct = {
+    productId,
+    productName,
+    productDescription,
+    productPrice,
+    productReleasedOn
+  };
+
+  addProduct(newProduct)
+    .then(() => {
+      alert('Product added successfully!');
+      document.getElementById('addProductForm').reset();
+      // Redirect to the product listing or another page if needed
+      window.location.href = 'index.html';
+    })
+    .catch(error => {
+      alert('Error adding product: ' + error.message);
+      console.error(error);
+    });
+});

@@ -1,0 +1,171 @@
+package com.oracle.pmsitis.repository;
+
+import static com.oracle.pmsapp.ApplicationResourceConfiguration.DB_QUERIES;
+import static com.oracle.pmsapp.repository.utilities.DaoUtility.closeConnection;
+import static com.oracle.pmsapp.repository.utilities.DaoUtility.convertRecordToModel;
+import static com.oracle.pmsapp.repository.utilities.DaoUtility.createConnection;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.oracle.pmsapp.models.ProductModel;
+
+public class ProductRepository implements RepositoryContract<ProductModel, Integer> {
+
+	@Override
+	public ProductModel insert(ProductModel data) throws Exception {
+		Connection connection = null;
+		PreparedStatement statement = null;
+		int result = 0;
+		try {
+			String insertQuery = DB_QUERIES.getProperty("add_product");
+			if (insertQuery == null || insertQuery.isEmpty() || insertQuery.isBlank())
+				throw new Exception("no insert query found");
+
+			connection = createConnection();
+
+			statement = connection.prepareStatement(insertQuery);
+
+			statement.setInt(1, data.getProductId());
+			statement.setString(2, data.getProductName());
+			statement.setString(3, data.getProductDescription());
+			statement.setDouble(4, data.getProductPrice());
+			statement.setDate(5, Date.valueOf(data.getProductReleasedOn()));
+			statement.setInt(6, data.getCategoryId());
+
+			result = statement.executeUpdate();
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			statement.close();
+			closeConnection(connection);
+		}
+		return result > 0 ? data : null;
+	}
+
+	@Override
+	public ProductModel remove(Integer id) throws Exception {
+		Connection connection = null;
+		PreparedStatement statement = null;
+		int result = 0;
+		ProductModel model = null;
+		try {
+			String deleteQuery = DB_QUERIES.getProperty("delete_product");
+			if (deleteQuery == null || deleteQuery.isEmpty() || deleteQuery.isBlank())
+				throw new Exception("no delete query found");
+
+			model = get(id);
+
+			connection = createConnection();
+			statement = connection.prepareStatement(deleteQuery);
+			statement.setInt(1, id);
+
+			result = statement.executeUpdate();
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			statement.close();
+			closeConnection(connection);
+		}
+		return result > 0 ? model : null;
+	}
+
+	@Override
+	public ProductModel modify(Integer id, ProductModel data) throws Exception {
+		Connection connection = null;
+		PreparedStatement statement = null;
+		int result = 0;
+		try {
+			String updateQuery = DB_QUERIES.getProperty("update_product");
+			if (updateQuery == null || updateQuery.isEmpty() || updateQuery.isBlank())
+				throw new Exception("no update query found");
+
+			connection = createConnection();
+
+			statement = connection.prepareStatement(updateQuery);
+
+			statement.setInt(6, id);
+			statement.setString(1, data.getProductName());
+			statement.setString(2, data.getProductDescription());
+			statement.setDouble(3, data.getProductPrice());
+			statement.setDate(4, Date.valueOf(data.getProductReleasedOn()));
+			statement.setInt(5, data.getCategoryId());
+
+			result = statement.executeUpdate();
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			statement.close();
+			closeConnection(connection);
+		}
+		if (result > 0) {
+			data.setProductId(id);
+			return data;
+		} else
+			return null;
+	}
+
+	@Override
+	public ProductModel get(Integer id) throws Exception {
+		Connection connection = null;
+		PreparedStatement statement = null;
+		ProductModel model = null;
+		ResultSet result = null;
+		try {
+			String fetchQuery = DB_QUERIES.getProperty("select_product");
+			if (fetchQuery == null || fetchQuery.isEmpty() || fetchQuery.isBlank())
+				throw new Exception("no select query found");
+
+			connection = createConnection();
+			statement = connection.prepareStatement(fetchQuery);
+			statement.setInt(1, id);
+
+			result = statement.executeQuery();
+			while (result.next()) {
+				model = convertRecordToModel(result);
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			statement.close();
+			closeConnection(connection);
+		}
+		return model;
+	}
+
+	@Override
+	public List<ProductModel> getAll() throws Exception {
+		Connection connection = null;
+		Statement statement = null;
+		List<ProductModel> models = null;
+		ResultSet result = null;
+		try {
+			String fetchQuery = DB_QUERIES.getProperty("select_all_products");
+			if (fetchQuery == null || fetchQuery.isEmpty() || fetchQuery.isBlank())
+				throw new Exception("no select query found");
+
+			connection = createConnection();
+			statement = connection.createStatement();
+
+			result = statement.executeQuery(fetchQuery);
+
+			models = new ArrayList<ProductModel>();
+			while (result.next()) {
+				ProductModel model = convertRecordToModel(result);
+				models.add(model);
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			statement.close();
+			closeConnection(connection);
+		}
+		return models;
+	}
+
+}

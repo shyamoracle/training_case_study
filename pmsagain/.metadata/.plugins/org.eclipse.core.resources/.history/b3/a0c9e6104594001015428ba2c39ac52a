@@ -1,0 +1,41 @@
+const BASE_URL = "http://localhost:8080/webapi/products";
+
+// Fetch all products
+async function fetchAllProducts() {
+    const response = await fetch(`${BASE_URL}/all`);
+    return response.json();
+}
+
+// Get product by ID
+async function fetchProductById(id) {
+    const response = await fetch(`${BASE_URL}/view?id=${id}`);
+    return response.json();
+}
+
+// Add product
+async function addProduct(product) {
+    const response = await fetch(`${BASE_URL}/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(product)
+    });
+    return response.json();
+}
+
+// Update product
+async function updateProduct(id, product) {
+    const response = await fetch(`${BASE_URL}/edit/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(product)
+    });
+    return response.json();
+}
+
+// Delete product
+async function deleteProduct(id) {
+    const response = await fetch(`${BASE_URL}/delete/${id}`, {
+        method: 'DELETE'
+    });
+    return response.json();
+}

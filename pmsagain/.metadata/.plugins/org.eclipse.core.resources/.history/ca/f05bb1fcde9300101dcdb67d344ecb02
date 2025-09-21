@@ -1,0 +1,28 @@
+package com.oracle.pmsitis;
+
+import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+
+import com.oracle.pmsitis.models.ProductModel;
+import com.oracle.pmsitis.repository.ProductRepository;
+import com.oracle.pmsitis.repository.RepositoryContract;
+import com.oracle.pmsitis.services.Manager;
+import com.oracle.pmsitis.services.ProductManager;
+
+
+
+
+@Provider
+public class ApplicationServicesBinderConfiguration extends AbstractBinder{
+
+	@Override
+	protected void configure() {
+		this.bind(ProductRepository.class).to(new TypeLiteral<RepositoryContract<ProductModel, Integer>>() {
+		});
+		
+		this.bind(ProductManager.class).to(new TypeLiteral<Manager<ProductModel, Integer>>() {
+		});
+		
+	}
+
+}

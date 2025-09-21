@@ -1,0 +1,27 @@
+import java.io.InputStream;
+import java.util.Properties;
+
+public class DbQueryPropertiesTest {
+    public static void main(String[] args) {
+        String resourceName = "dbquery.properties";
+
+        try (InputStream stream = DbQueryPropertiesTest.class.getClassLoader().getResourceAsStream(resourceName)) {
+            if (stream == null) {
+                System.out.println("❌ Resource '" + resourceName + "' NOT found on the classpath!");
+                return;
+            }
+
+            Properties props = new Properties();
+            props.load(stream);
+
+            System.out.println("✅ Loaded '" + resourceName + "' successfully!");
+            System.out.println("--- Contents ---");
+            props.forEach((k, v) -> System.out.println(k + " = " + v));
+            System.out.println("----------------");
+
+        } catch (Exception e) {
+            System.out.println("❌ Exception occurred while loading properties:");
+            e.printStackTrace();
+        }
+    }
+}

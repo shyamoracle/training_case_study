@@ -1,0 +1,53 @@
+package com.oracle.pmsitis;
+packages("com.oracle.pmsitis"); 
+register(org.glassfish.jersey.jackson.JacksonFeature.class);
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+
+
+import org.glassfish.jersey.server.ResourceConfig;
+
+public class ApplicationResourceConfiguration extends ResourceConfig {
+	public static final Properties DB_SETTINGS = new Properties();
+	public static final Properties DB_QUERIES = new Properties();
+	
+	private static final String DB_SETTINGS_RESOURCE_NAME = "database.properties";
+	private static final String DB_QUERIES_RESOURCE_NAME = "dbquery.properties";
+	
+	public ApplicationResourceConfiguration() throws IOException {
+
+		this.register(new ApplicationServicesBinderConfiguration());
+		loadFromPropertiesFile(DB_SETTINGS_RESOURCE_NAME, DB_SETTINGS);
+		loadFromPropertiesFile(DB_QUERIES_RESOURCE_NAME, DB_QUERIES);
+	}
+	
+	public void loadFromPropertiesFile(String resourceName, Properties properties) throws IOException {
+	    InputStream stream = null;
+	    try {
+	        Class<?> clsInfo = (Class<?>) this.getClass();
+	        ClassLoader loader = clsInfo.getClassLoader();
+	        stream = loader.getResourceAsStream(resourceName);
+	        if (stream == null) {
+	            throw new IOException("❌ Resource not found: " + resourceName);
+	        }
+	        properties.load(stream);
+
+	        System.out.println("✅ Loaded properties from " + resourceName);
+	        properties.forEach((k, v) -> System.out.println(k + " = " + v));
+
+	    } catch (IOException e) {
+	        throw e;
+	    } catch (Exception e) {
+	        throw e;
+	    } finally {
+	        if (stream != null)
+	            stream.close();
+	    }
+	}
+
+	
+
+}
+

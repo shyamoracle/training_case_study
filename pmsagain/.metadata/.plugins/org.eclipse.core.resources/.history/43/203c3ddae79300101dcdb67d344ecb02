@@ -1,0 +1,69 @@
+package com.oracle.pmsitis.repository.utilities;
+
+import static com.oracle.pmsitis.ApplicationResourceConfiguration.DB_SETTINGS;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.oracle.pmsitis.models.ProductModel;
+
+public class DaoUtility {
+	
+    static {
+        try (InputStream stream = DaoUtility.class.getClassLoader().getResourceAsStream("database.properties")) {
+            if (stream == null) {
+                throw new RuntimeException("database.properties not found in classpath");
+            }
+            DB_SETTINGS.load(stream);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load database.properties", e);
+        }
+    }
+	public static Connection createConnection() throws ClassNotFoundException, SQLException, Exception {
+		loadDriver();
+		
+		String url = DB_SETTINGS.getProperty("url");
+		if(url == null || url.isBlank() || url.isEmpty())
+			throw new Exception("connection string not found");
+		
+		String userName = DB_SETTINGS.getProperty("username");
+		if(userName == null || userName.isBlank() || userName.isEmpty())
+			throw new Exception("user name not found");
+		
+		String password = DB_SETTINGS.getProperty("password");
+		if(password == null || password.isBlank() || password.isEmpty())
+			throw new Exception("password not found");
+		
+//		if(url != null && !url.isEmpty() && !url.isBlank())
+		return DriverManager.getConnection(url, userName, password); 
+	}
+	
+	public static void closeConnection(Connection connection) throws SQLException {
+		if(connection != null)
+			connection.close();
+	}
+	
+	public static ProductModel convertRecordToModel(ResultSet result) throws SQLException {
+		ProductModel model = new ProductModel();
+		
+		model.setProductId(result.getInt("ID"));
+		model.setProductName(result.getString("NAME"));
+		model.setProductDescription(result.getString("DESCRIPTION"));
+		model.setProductPrice(result.getDouble("PRICE"));
+		model.setProductReleasedOn(result.getDate("RELEASE_DATE").toLocalDate());
+		
+		return model;
+	}
+	
+	private static void loadDriver() throws ClassNotFoundException, Exception {
+		String driver = DB_SETTINGS.getProperty("driver");
+		if(driver.isBlank() || driver.isEmpty() || driver == null)
+			throw new Exception("driver not found");
+		
+		Class.forName(driver);
+	}
+}

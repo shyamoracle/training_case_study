@@ -1,0 +1,60 @@
+package com.oracle.pmsitis.repository.utilities;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Properties;
+
+import com.oracle.pmsitis.models.ProductModel;
+import static com.oracle.pmsitis.ApplicationResourceConfiguration.DB_SETTINGS;
+
+public class DaoUtility {
+
+
+
+	public static Connection createConnection() throws Exception {
+	    loadDriver();
+
+	    String url = DB_SETTINGS.getProperty("url");
+	    String userName = DB_SETTINGS.getProperty("username");
+	    String password = DB_SETTINGS.getProperty("password");
+
+	    if (url == null || url.isBlank()) {
+	        throw new Exception("{\"error\": \"Database URL not found in properties\"}");
+	    }
+	    if (userName == null || userName.isBlank()) {
+	        throw new Exception("{\"error\": \"Username not found in properties\"}");
+	    }
+	    if (password == null || password.isBlank()) {
+	        throw new Exception("{\"error\": \"Password not found in properties\"}");
+	    }
+
+	    return DriverManager.getConnection(url, userName, password);
+	}
+
+
+    public static void closeConnection(Connection connection) throws SQLException {
+        if (connection != null) connection.close();
+    }
+
+    public static ProductModel convertRecordToModel(ResultSet result) throws SQLException {
+        ProductModel model = new ProductModel();
+
+        model.setProductId(result.getInt("ID"));
+        model.setProductName(result.getString("NAME"));
+        model.setProductDescription(result.getString("DESCRIPTION"));
+        model.setProductPrice(result.getDouble("PRICE"));
+        model.setProductReleasedOn(result.getDate("RELEASE_DATE").toLocalDate());
+
+        return model;
+    }
+
+    private static void loadDriver() throws ClassNotFoundException, Exception {
+        String driver = DB_SETTINGS.getProperty("driver");
+        if (driver == null || driver.isBlank()) throw new Exception("driver not found");
+        Class.forName(driver);
+    }
+}

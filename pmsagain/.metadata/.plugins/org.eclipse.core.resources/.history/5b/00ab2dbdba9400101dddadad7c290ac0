@@ -1,0 +1,86 @@
+const BASE_URL = "http://localhost:8080/pmsapp/webapi/products";
+
+// Fetch product by ID
+function getProduct(id) {
+  return fetch(`${BASE_URL}/view?id=${id}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Product not found');
+      }
+      return response.json();
+    });
+}
+
+// Update product by ID
+function updateProduct(id, product) {
+  return fetch(`${BASE_URL}/edit/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(product)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to update product');
+    }
+    return response.json();
+  });
+}
+
+// Populate form fields with product data
+function populateForm(product) {
+  document.getElementById('productId').value = product.productId;
+  document.getElementById('productName').value = product.productName;
+  document.getElementById('productDescription').value = product.productDescription;
+  document.getElementById('productPrice').value = product.productPrice;
+  document.getElementById('productReleasedOn').value = product.productReleasedOn;
+}
+
+// Handle form submission for updating product
+function handleFormSubmit(event) {
+  event.preventDefault();
+
+  const id = document.getElementById('productId').value;
+  const updatedProduct = {
+    productId: parseInt(id),
+    productName: document.getElementById('productName').value.trim(),
+    productDescription: document.getElementById('productDescription').value.trim(),
+    productPrice: parseFloat(document.getElementById('productPrice').value),
+    productReleasedOn: document.getElementById('productReleasedOn').value
+  };
+
+  updateProduct(id, updatedProduct)
+    .then(data => {
+      alert('Product updated successfully!');
+      // Redirect or update UI accordingly
+      window.location.href = 'index.html';  // example redirect to product list page
+    })
+    .catch(error => {
+      alert('Error updating product: ' + error.message);
+      console.error(error);
+    });
+}
+
+// On page load, fetch the product and populate form
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const id = urlParams.get('id');
+  if (!id) {
+    alert('No product ID specified');
+    return;
+  }
+
+  getProduct(id)
+    .then(product => {
+      populateForm(product);
+    })
+    .catch(error => {
+      alert('Error fetching product: ' + error.message);
+      console.error(error);
+    });
+
+  // Attach form submit handler
+  const form = document.getElementById('editProductForm');
+  form.addEventListener('submit', handleFormSubmit);
+});

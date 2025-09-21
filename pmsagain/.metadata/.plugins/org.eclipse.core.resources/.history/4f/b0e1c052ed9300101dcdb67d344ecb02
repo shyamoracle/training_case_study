@@ -1,0 +1,18 @@
+package com.oracle.pmsitis.test;
+
+
+import com.oracle.pmsitis.ApplicationResourceConfiguration;
+
+public class TestPropertyLoading {
+    public static void main(String[] args) {
+        try {
+            ApplicationResourceConfiguration config = new ApplicationResourceConfiguration();
+            // This will trigger constructor, loading properties and printing debug info
+            
+            // Optionally, you can manually call the test method
+            config.testPropertiesLoaded();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

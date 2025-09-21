@@ -1,0 +1,14 @@
+package com.oracle.pmsitis.services;
+
+package com.oracle.pmsitis.services;
+
+import java.util.List;
+
+public interface Manager<TModel, TPKey> {
+	TModel add(TModel data) throws Exception;
+	TModel delete(TPKey id) throws Exception;
+	TModel fetch(TPKey id) throws Exception;
+	List<TModel> fetchAll() throws Exception;
+	TModel update(TPKey id,TModel data) throws Exception;
+	List<TModel> searchByName(String name) throws Exception;
+}

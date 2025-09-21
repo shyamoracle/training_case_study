@@ -1,0 +1,33 @@
+package com.oracle.pmsitis.controllers;
+import com.oracle.pmsitis.ApplicationResourceConfiguration;
+
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+@Path("auth")
+public class AuthController {
+
+    public static class Credentials {
+        public String username;
+        public String password;
+
+        // Required for Jackson (JSON to POJO)
+        public Credentials() {}
+
+        public String getUsername() { return username; }
+        public String getPassword() { return password; }
+    }
+
+    @POST
+    @Path("login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response login(Credentials creds) {
+        if (creds.getUsername() != null && creds.getPassword() != null) {
+            ApplicationResourceConfiguration.updateDbCredentials(creds.getUsername(), creds.getPassword());
+            return Response.ok().build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing username or password").build();
+        }
+    }
+}

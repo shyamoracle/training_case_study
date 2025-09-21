@@ -1,0 +1,5 @@
+package com.oracle.pmsitis.test;
+
+public class TestPropertyLoading {
+
+}

@@ -1,0 +1,129 @@
+package com.oracle.pmsitis.controllers;
+
+import java.net.URI;
+import java.util.List;
+
+import com.oracle.pmsitis.models.ProductModel;
+import com.oracle.pmsitis.services.Manager;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+package com.oracle.pmsapp.controllers;
+
+import java.net.URI;
+import java.util.List;
+
+import com.oracle.pmsapp.models.ProductModel;
+import com.oracle.pmsapp.services.Manager;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+@Path("products")
+public class ProductController {
+    
+//	DI through field
+	@Inject
+	private Manager<ProductModel, Integer> manager;
+	
+	public ProductController(){
+		
+	}
+
+	@POST
+	@Path("add")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	
+	public Response addProduct(ProductModel data) {
+		try {
+			ProductModel model = manager.add(data);
+			return Response.created(new URI("products/addProduct")).entity(model).build();
+		}catch (Exception e) {
+			return Response.serverError().entity(e.getMessage()).build();
+		}
+	}
+
+	@DELETE
+	@Path("delete/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteProduct(@PathParam("id") int id) {
+		try {
+			ProductModel model = manager.delete(id);
+			return Response.ok(model).build();
+		} catch (Exception e) {
+			return Response.serverError().entity(e.getMessage()).build();
+		}
+	}
+
+	@GET
+	@Path("view")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getProduct(@QueryParam("id") int id) {
+		try {
+			ProductModel model = manager.fetch(id);
+			return Response.ok(model).build();
+		} catch (Exception e) {
+			return Response.serverError().entity(e.getMessage()).build();
+		}
+	}
+
+	@GET
+	@Path("all")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getProducts() {
+		try {
+			List <ProductModel> models = manager.fetchAll();
+			return Response.ok(models).build();
+		} catch (Exception e) {
+			return Response.serverError().entity(e.getMessage()).build();
+		}
+	}
+
+	@PUT
+	@Path("edit/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateProduct(@PathParam("id") int id, ProductModel data) {
+		try {
+			ProductModel model = manager.update(id, data);
+			return Response.ok(model).build();
+		} catch (Exception e) {
+			return Response.serverError().entity(e.getMessage()).build();
+		}
+	}
+	
+	@GET
+	@Path("search/{name}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response searchProductsByName(@PathParam("name") String name) throws Exception{
+		try {
+			List<ProductModel> models = manager.searchByName(name);
+			return Response.ok(models).build();
+			
+		} catch (Exception e) {
+			return Response.serverError().entity(e.getMessage()).build();
+		}
+	}
+}

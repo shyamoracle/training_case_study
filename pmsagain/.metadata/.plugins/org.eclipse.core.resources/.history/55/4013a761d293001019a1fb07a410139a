@@ -1,0 +1,5 @@
+package com.oracle.pmsitis.models;
+
+public class ProductModel {
+
+}

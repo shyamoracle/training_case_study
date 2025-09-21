@@ -1,0 +1,30 @@
+const BASE_URL = "http://localhost:8080/pmsapp/webapi/products";
+
+function addProduct(product) {
+  fetch(`${BASE_URL}/add`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(product)
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Product added:', data);
+    // maybe redirect or show success message
+  })
+  .catch(error => console.error('Error adding product:', error));
+}
+
+// Example usage on form submit
+document.getElementById('addForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+  const product = {
+    productId: parseInt(document.getElementById('productId').value),
+    productName: document.getElementById('productName').value,
+    productDescription: document.getElementById('productDescription').value,
+    productPrice: parseFloat(document.getElementById('productPrice').value),
+    productReleasedOn: document.getElementById('productReleasedOn').value // yyyy-MM-dd format
+  };
+  addProduct(product);
+});

@@ -1,0 +1,117 @@
+package com.oracle.pmsitis.services;
+
+import java.util.List;
+
+import com.oracle.pmsitis.models.ProductModel;
+import com.oracle.pmsitis.repository.RepositoryContract;
+
+import jakarta.inject.Inject;
+
+public class ProductManager implements Manager<ProductModel, Integer> {
+
+	private final RepositoryContract<ProductModel, Integer> repository;
+
+	// DI through constructor
+	@Inject
+	public ProductManager(RepositoryContract<ProductModel, Integer> repository) {
+		this.repository = repository;
+	}
+
+	@Override
+	public ProductModel add(ProductModel data) throws Exception {
+		try {
+			if (data == null)
+				throw new NullPointerException("product instance is null");
+
+			if (data.getProductId() <= 0)
+				throw new Exception("product id should be more than zero");
+
+			if (data.getProductName().isBlank() || data.getProductName().isEmpty() || data.getProductName() == null)
+				throw new Exception("product name must be present");
+
+			ProductModel model = repository.insert(data);
+			if (model == null)
+				throw new NullPointerException("the product could not be added");
+
+			return model;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
+	@Override
+	public ProductModel delete(Integer id) throws Exception {
+		try {
+			if (id <= 0)
+				throw new Exception("product id should be more than zero");
+
+			ProductModel model = repository.remove(id);
+			if (model == null)
+				throw new NullPointerException("the product with id: " + id + " does not exist");
+
+			return model;
+
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
+	@Override
+	public ProductModel fetch(Integer id) throws Exception {
+		try {
+			ProductModel model = repository.get(id);
+			if (model == null)
+				throw new NullPointerException("the product with id: " + id + " does not exist");
+
+			return model;
+
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
+	@Override
+	public List<ProductModel> fetchAll() throws Exception {
+		try {
+			List<ProductModel> models = repository.getAll();
+			if (models == null || models.isEmpty())
+				throw new Exception("no products found");
+
+			return models.stream().sorted((p1, p2) -> p1.getProductId() - p2.getProductId()).toList();
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
+	@Override
+	public ProductModel update(Integer id, ProductModel data) throws Exception {
+		try {
+			ProductModel model = repository.modify(id, data);
+			if (model == null)
+				throw new NullPointerException("the product with id: " + id + " does not exist");
+
+			return model;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
+	@Override
+	public List<ProductModel> searchByName(String name) throws Exception {
+		try {
+			if (name == null)
+				throw new NullPointerException("name was not passed");
+
+			List<ProductModel> models = repository.getAll();
+			if (models == null || models.isEmpty())
+				throw new Exception("no products found");
+
+			return models.stream().filter(p -> p.getProductName().toLowerCase().contains(name.toLowerCase()))
+					.sorted((p1, p2) -> p1.getProductName().compareTo(p2.getProductName())).toList();
+
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
+}

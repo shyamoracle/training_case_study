@@ -1,0 +1,22 @@
+const urlParams = new URLSearchParams(window.location.search);
+const id = urlParams.get("id");
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const product = await getProduct(id);
+  document.getElementById("productId").value = product.productId;
+  document.getElementById("productName").value = product.productName;
+  document.getElementById("productDescription").value = product.productDescription;
+  document.getElementById("productPrice").value = product.productPrice;
+  document.getElementById("productReleasedOn").value = product.productReleasedOn;
+});
+
+document.getElementById("editForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const product = {
+    productName: document.getElementById("productName").value,
+    productDescription: document.getElementById("productDescription").value,
+    productPrice: +document.getElementById("productPrice").value,
+    productReleasedOn: document
+/**
+ * 
+ */

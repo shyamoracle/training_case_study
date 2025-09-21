@@ -1,0 +1,38 @@
+let productsCache = [];
+
+document.addEventListener("DOMContentLoaded", async () => {
+  productsCache = await getAllProducts();
+
+  // Initialize sorting and render the result
+  const initiallySorted = initSortUI(productsCache, renderTable);
+  renderTable(initiallySorted);
+
+  initSearch(); // still in search.js
+});
+
+function renderTable(products) {
+  const tableBody = document.getElementById("productTableBody");
+  tableBody.innerHTML = "";
+
+  products.forEach(product => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${product.productId}</td>
+      <td>${product.productName}</td>
+      <td>${product.productDescription}</td>
+      <td>${product.productPrice}</td>
+      <td>${product.productReleasedOn}</td>
+      <td>
+        <a href="edit-product.html?id=${product.productId}" class="btn btn-sm btn-primary">Edit</a>
+        <button class="btn btn-sm btn-danger" onclick="deleteAndReload(${product.productId})">Delete</button>
+      </td>`;
+    tableBody.appendChild(row);
+  });
+}
+
+async function deleteAndReload(id) {
+  if (confirm("Are you sure you want to delete this product?")) {
+    await deleteProduct(id);
+    window.location.reload();
+  }
+}

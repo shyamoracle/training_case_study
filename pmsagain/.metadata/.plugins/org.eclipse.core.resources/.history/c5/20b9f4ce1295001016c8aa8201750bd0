@@ -1,0 +1,65 @@
+let currentSort = { column: null, ascending: true };
+let productsCache = [];
+
+/**
+ * Initializes sorting functionality.
+ * @param {Array} products - Initial list of products to sort and display.
+ * @param {Function} renderCallback - Callback to render the sorted table.
+ */
+function initSort(products, renderCallback) {
+  productsCache = products;
+  renderCallback(products); // render initial data
+
+  document.querySelectorAll("th.sortable").forEach(th => {
+    th.style.cursor = "pointer";
+    th.addEventListener("click", () => {
+      const column = th.dataset.column;
+
+      if (currentSort.column === column) {
+        currentSort.ascending = !currentSort.ascending;
+      } else {
+        currentSort.column = column;
+        currentSort.ascending = true;
+      }
+
+      // Remove sort classes from all headers
+      document.querySelectorAll("th.sortable").forEach(header => {
+        header.classList.remove("sorted-asc", "sorted-desc");
+      });
+
+      // Add sort indicator to the active header
+      th.classList.add(currentSort.ascending ? "sorted-asc" : "sorted-desc");
+
+      const sorted = [...productsCache].sort((a, b) => {
+        let valA = a[column];
+        let valB = b[column];
+
+        // Normalize date strings and numbers
+        if (!isNaN(valA) && !isNaN(valB)) {
+          valA = parseFloat(valA);
+          valB = parseFloat(valB);
+        } else if (isValidDate(valA) && isValidDate(valB)) {
+          valA = new Date(valA);
+          valB = new Date(valB);
+        } else {
+          valA = valA.toString().toLowerCase();
+          valB = valB.toString().toLowerCase();
+        }
+
+        if (valA < valB) return currentSort.ascending ? -1 : 1;
+        if (valA > valB) return currentSort.ascending ? 1 : -1;
+        return 0;
+      });
+
+      renderCallback(sorted);
+    });
+  });
+}
+
+/**
+ * Utility function to check if a value is a valid date.
+ * @param {*} val 
+ */
+function isValidDate(val) {
+  return !isNaN(Date.parse(val));
+}

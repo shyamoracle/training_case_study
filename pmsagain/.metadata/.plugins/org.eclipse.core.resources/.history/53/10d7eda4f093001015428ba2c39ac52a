@@ -1,0 +1,27 @@
+package com.oracle.pmsitis.test;
+
+package com.oracle.pmsitis.tests;
+
+import java.io.IOException;
+
+import com.oracle.pmsitis.ApplicationResourceConfiguration;
+
+public class ApplicationResourceConfigurationTest {
+
+    public static void main(String[] args) {
+        try {
+            ApplicationResourceConfiguration config = new ApplicationResourceConfiguration();
+
+            System.out.println("DB_SETTINGS Properties:");
+            ApplicationResourceConfiguration.DB_SETTINGS.forEach((k, v) -> System.out.println(k + " = " + v));
+
+            System.out.println("\nDB_QUERIES Properties:");
+            ApplicationResourceConfiguration.DB_QUERIES.forEach((k, v) -> System.out.println(k + " = " + v));
+
+            System.out.println("\n✅ Both properties files loaded successfully!");
+        } catch (IOException e) {
+            System.err.println("❌ Failed to load properties files: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}

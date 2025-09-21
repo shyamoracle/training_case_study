@@ -1,0 +1,65 @@
+const apiUrl = 'http://localhost:8080/pmsapp/webapi/products/add';
+
+// This runs when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+  // Make sure your form ID matches your HTML
+  const form = document.getElementById('addForm');
+  if (!form) {
+    console.error("Form with id 'addForm' not found.");
+    return;
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    // Get values from inputs
+    const productName = document.getElementById('productName').value.trim();
+    const productDescription = document.getElementById('productDescription').value.trim();
+    const productPrice = parseFloat(document.getElementById('productPrice').value);
+    const productReleasedOn = document.getElementById('productReleasedOn').value; // should be yyyy-mm-dd
+
+    // Simple validation
+    if (!productName || !productDescription || isNaN(productPrice) || !productReleasedOn) {
+      alert('Please fill in all required fields correctly.');
+      return;
+    }
+
+    // Create product object - **DO NOT** send productId if backend auto-generates
+    const newProduct = {
+      productName,
+      productDescription,
+      productPrice,
+      productReleasedOn
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newProduct)
+      });
+
+      if (!response.ok) {
+        // Try to read error message from backend
+        const errorData = await response.json().catch(() => null);
+        const errorMsg = errorData?.message || 'Failed to add product';
+        throw new Error(errorMsg);
+      }
+
+      const createdProduct = await response.json();
+      alert('Product added successfully!');
+
+      // Reset form
+      form.reset();
+
+      // Redirect to product list page, e.g. index.html
+      window.location.href = 'index.html';
+
+    } catch (error) {
+      console.error('Error adding product:', error);
+      alert('Error adding product: ' + error.message);
+    }
+  });
+});

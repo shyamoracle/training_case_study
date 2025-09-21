@@ -1,0 +1,65 @@
+fetch('webapi/products/all')
+    .then(res => res.json())
+    .then(products => {
+      const total = products.length;
+      const prices = products.map(p => p.productPrice);
+      const names = products.map(p => p.productName);
+      const dates = products.map(p => new Date(p.productReleasedOn));
+
+      // Stats
+      const avg = prices.reduce((a, b) => a + b, 0) / total;
+      const earliest = new Date(Math.min(...dates));
+      const latest = new Date(Math.max(...dates));
+
+      document.getElementById('totalProducts').textContent = total;
+      document.getElementById('averagePrice').textContent = `$${avg.toFixed(2)}`;
+      document.getElementById('earliestDate').textContent = earliest.toISOString().split('T')[0];
+      document.getElementById('latestDate').textContent = latest.toISOString().split('T')[0];
+
+      // Price Chart
+      new Chart(document.getElementById('priceChart'), {
+        type: 'bar',
+        data: {
+          labels: names,
+          datasets: [{
+            label: 'Price ($)',
+            data: prices,
+            backgroundColor: '#74b9ff'
+          }]
+        }
+      });
+
+      // Release Chart
+      new Chart(document.getElementById('releaseChart'), {
+        type: 'line',
+        data: {
+          labels: names,
+          datasets: [{
+            label: 'Release Date',
+            data: dates.map(d => d.getTime()),
+            backgroundColor: '#a29bfe',
+            borderColor: '#a29bfe',
+            borderWidth: 2,
+            pointRadius: 3,
+            fill: false,
+            tension: 0.3
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              ticks: {
+                callback: function(value) {
+                  return new Date(value).toISOString().split('T')[0];
+                }
+              }
+            }
+          }
+        }
+      });
+    })
+    .catch(err => {
+      console.error('Failed to load product data:', err);
+    });
+ * 
+ */

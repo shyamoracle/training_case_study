@@ -1,0 +1,18 @@
+const BASE_URL = "http://localhost:8080/pmsapp/webapi/products";
+
+function getProduct(id) {
+  return fetch(`${BASE_URL}/view?id=${id}`)
+    .then(response => response.json());
+}
+
+// Use it to populate your edit form
+window.onload = function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const id = urlParams.get('id');
+  if (id) {
+    getProduct(id).then(product => {
+      document.getElementById('productName').value = product.productName;
+      // populate other form fields similarly...
+    });
+  }
+};

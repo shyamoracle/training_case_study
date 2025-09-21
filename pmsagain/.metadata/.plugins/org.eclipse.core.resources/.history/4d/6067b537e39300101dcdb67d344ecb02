@@ -1,0 +1,25 @@
+package com.oracle.pmsitis.test;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+public class TestOracleConnection {
+    public static void main(String[] args) {
+        try {
+            // Load Oracle Driver
+            Class.forName("oracle.jdbc.OracleDriver"); // or oracle.jdbc.driver.OracleDriver for ojdbc8
+            
+            // Try connecting
+            String url = "jdbc:oracle:thin:@localhost:1521:orcl";
+            String username = "archi";
+            String password = "archi";
+
+            Connection conn = DriverManager.getConnection(url, username, password);
+            System.out.println("✅ Connection Successful!");
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("❌ Connection Failed:");
+            e.printStackTrace();
+        }
+    }
+}

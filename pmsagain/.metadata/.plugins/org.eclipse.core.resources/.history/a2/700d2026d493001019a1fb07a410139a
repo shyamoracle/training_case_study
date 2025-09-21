@@ -1,0 +1,5 @@
+package com.oracle.pmsitis.services;
+
+public class ProductManager {
+
+}

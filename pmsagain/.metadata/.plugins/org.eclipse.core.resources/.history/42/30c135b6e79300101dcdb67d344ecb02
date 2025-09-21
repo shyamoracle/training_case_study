@@ -1,0 +1,44 @@
+package com.oracle.pmsitis.repository.utilities;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
+
+public class DaoUtility {
+    private static final Properties DB_SETTINGS = new Properties();
+
+    static {
+        try (InputStream stream = DaoUtility.class.getClassLoader().getResourceAsStream("database.properties")) {
+            if (stream == null) {
+                throw new RuntimeException("database.properties not found in classpath");
+            }
+            DB_SETTINGS.load(stream);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load database.properties", e);
+        }
+    }
+
+    public static Connection createConnection() throws ClassNotFoundException, SQLException, Exception {
+        loadDriver();
+
+        String url = DB_SETTINGS.getProperty("url");
+        if (url == null || url.isBlank()) throw new Exception("connection string not found");
+
+        String userName = DB_SETTINGS.getProperty("username");
+        if (userName == null || userName.isBlank()) throw new Exception("user name not found");
+
+        String password = DB_SETTINGS.getProperty("password");
+        if (password == null || password.isBlank()) throw new Exception("password not found");
+
+        return DriverManager.getConnection(url, userName, password);
+    }
+
+    private static void loadDriver() throws ClassNotFoundException, Exception {
+        String driver = DB_SETTINGS.getProperty("driver");
+        if (driver == null || driver.isBlank()) throw new Exception("driver not found");
+        Class.forName(driver);
+    }
+}

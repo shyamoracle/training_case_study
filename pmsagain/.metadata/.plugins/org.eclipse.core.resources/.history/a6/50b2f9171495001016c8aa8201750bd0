@@ -1,0 +1,58 @@
+let currentSort = { column: null, ascending: true };
+let productsCache = [];
+
+/**
+ * Initializes sortable columns for the table.
+ */
+function initSort(products, renderCallback) {
+  productsCache = products;
+  renderCallback(products); // initial render
+
+  document.querySelectorAll("th.sortable").forEach(th => {
+    th.style.cursor = "pointer";
+
+    th.addEventListener("click", () => {
+      const column = th.dataset.column;
+
+      if (currentSort.column === column) {
+        currentSort.ascending = !currentSort.ascending;
+      } else {
+        currentSort.column = column;
+        currentSort.ascending = true;
+      }
+
+      // Update sort indicator classes
+      document.querySelectorAll("th.sortable").forEach(header => {
+        header.classList.remove("sorted-asc", "sorted-desc");
+      });
+      th.classList.add(currentSort.ascending ? "sorted-asc" : "sorted-desc");
+
+      const sorted = [...productsCache].sort((a, b) => {
+        let valA = a[column];
+        let valB = b[column];
+
+        // Normalize values
+        if (!isNaN(valA) && !isNaN(valB)) {
+          valA = parseFloat(valA);
+          valB = parseFloat(valB);
+        } else if (isValidDate(valA) && isValidDate(valB)) {
+          valA = new Date(valA);
+          valB = new Date(valB);
+        } else {
+          valA = valA.toString().toLowerCase();
+          valB = valB.toString().toLowerCase();
+        }
+
+        if (valA < valB) return currentSort.ascending ? -1 : 1;
+        if (valA > valB) return currentSort.ascending ? 1 : -1;
+        return 0;
+      });
+
+      renderCallback(sorted);
+    });
+  });
+}
+
+function isValidDate(val) {
+  return !isNaN(Date.parse(val));
+}
